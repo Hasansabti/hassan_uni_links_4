@@ -14,10 +14,10 @@ import io.flutter.plugin.common.PluginRegistry;
 
 public class UniLinksPlugin
         implements FlutterPlugin,
-                MethodChannel.MethodCallHandler,
-                EventChannel.StreamHandler,
-                ActivityAware,
-                PluginRegistry.NewIntentListener {
+        MethodChannel.MethodCallHandler,
+        EventChannel.StreamHandler,
+        ActivityAware,
+        PluginRegistry.NewIntentListener {
 
     private static final String MESSAGES_CHANNEL = "uni_links/messages";
     private static final String EVENTS_CHANNEL = "uni_links/events";
@@ -34,17 +34,15 @@ public class UniLinksPlugin
         String dataString = intent.getDataString();
 
         if (Intent.ACTION_VIEW.equals(action) ) {
-            if((intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0) {
-                if (initialIntent) {
-                    initialLink = dataString;
-                    initialIntent = false;
-                }
-            }else{
-                initialLink = "";
-            }
+
+            initialLink = dataString;
+
+
             latestLink = dataString;
             if (changeReceiver != null) changeReceiver.onReceive(context, intent);
         }
+        intent.setData(null);
+
     }
 
     private BroadcastReceiver createChangeReceiver(final EventChannel.EventSink events) {
@@ -60,7 +58,9 @@ public class UniLinksPlugin
                 if (dataString == null) {
                     events.error("UNAVAILABLE", "Link unavailable", null);
                 } else {
+
                     events.success(dataString);
+
                 }
             }
         };
@@ -112,8 +112,10 @@ public class UniLinksPlugin
     public void onMethodCall(MethodCall call, MethodChannel.Result result) {
         if (call.method.equals("getInitialLink")) {
             result.success(initialLink);
+            initialLink = "";
         } else if (call.method.equals("getLatestLink")) {
             result.success(latestLink);
+            initialLink = "";
         } else {
             result.notImplemented();
         }
