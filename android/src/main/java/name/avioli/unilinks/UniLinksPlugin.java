@@ -33,10 +33,14 @@ public class UniLinksPlugin
         String action = intent.getAction();
         String dataString = intent.getDataString();
 
-        if (Intent.ACTION_VIEW.equals(action) && ((intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0)) {
-            if (initialIntent) {
-                initialLink = dataString;
-                initialIntent = false;
+        if (Intent.ACTION_VIEW.equals(action) ) {
+            if((intent.getFlags() & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0) {
+                if (initialIntent) {
+                    initialLink = dataString;
+                    initialIntent = false;
+                }
+            }else{
+                initialLink = "";
             }
             latestLink = dataString;
             if (changeReceiver != null) changeReceiver.onReceive(context, intent);
